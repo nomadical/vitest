@@ -1,4 +1,22 @@
 (() => {
+  // Vite's client renders its error overlay only when no `vite-error-overlay`
+  // element is registered yet. Vitest reports these errors itself, and the
+  // overlay would capture clicks aimed at the tested page.
+  if (!customElements.get('vite-error-overlay')) {
+    customElements.define(
+      'vite-error-overlay',
+      class extends HTMLElement {
+        connectedCallback() {
+          this.remove()
+        }
+
+        close() {
+          this.remove()
+        }
+      },
+    )
+  }
+
   function wrapModule(moduleCallback) {
     if (typeof moduleCallback !== "function") {
       return moduleCallback
