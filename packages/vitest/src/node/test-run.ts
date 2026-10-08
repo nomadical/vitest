@@ -24,7 +24,7 @@ import assert from 'node:assert'
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { copyFile, mkdir, writeFile } from 'node:fs/promises'
-import { isPrimitive, sanitizeFilePath } from '@vitest/utils/helpers'
+import { isPrimitive, limitFileName, sanitizeFilePath } from '@vitest/utils/helpers'
 import { serializeValue } from '@vitest/utils/serialize'
 import { parseErrorStacktrace } from '@vitest/utils/source-map'
 import { extractSourcemapFromFile } from '@vitest/utils/source-map/node'
@@ -319,7 +319,9 @@ export class TestRun {
       const hash = createHash('sha1').update(currentPath).digest('hex')
       const newPath = resolve(
         project.config.attachmentsDir,
-        `${filename ? `${sanitizeFilePath(filename)}-` : ''}${hash}${extname(currentPath)}`,
+        filename
+          ? limitFileName(sanitizeFilePath(filename), `-${hash}${extname(currentPath)}`)
+          : `${hash}${extname(currentPath)}`,
       )
       if (!existsSync(project.config.attachmentsDir)) {
         await mkdir(project.config.attachmentsDir, { recursive: true })

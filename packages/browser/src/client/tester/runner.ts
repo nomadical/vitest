@@ -27,6 +27,7 @@ import {
   loadSnapshotSerializers,
   takeCoverageInsideWorker,
 } from 'vitest/internal/browser'
+import { limitFileName } from '../../../../utils/src/helpers'
 import { createStackString, parseStacktrace } from '../../../../utils/src/source-map'
 import { getTestName } from '../../../../vitest/src/utils/tasks'
 import { getBrowserState, getWorkerState, moduleRunner, now } from '../utils'
@@ -201,7 +202,7 @@ function createBrowserRunner(
               this.config.attachmentsDir,
               'failure-screenshots',
               basename(task.file.filepath),
-              `${getFailureScreenshotName(task, retry, repeats)}.png`,
+              limitFileName(getFailureScreenshotName(task, retry, repeats), '.png'),
             ),
           })
           .catch((err) => {

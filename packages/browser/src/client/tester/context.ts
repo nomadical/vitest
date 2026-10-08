@@ -21,6 +21,7 @@ import type { Locator as LocatorAPI } from './locators'
 import type { BrowserTraceEntryStatus } from './trace'
 import { vi } from 'vitest'
 import { __INTERNAL, stringify } from 'vitest/internal/browser'
+import { limitFileName } from '../../../../utils/src/helpers'
 import { ensureAwaited, getBrowserState, getWorkerState } from '../utils'
 import { advanceFakeTimersWhilePending, ScreenshotAction } from './action'
 import {
@@ -433,7 +434,8 @@ export const page: BrowserPage = {
     screenshotIds[repeatCount] ??= {}
     screenshotIds[repeatCount][taskName] = number + 1
 
-    const name = options.path || `${taskName.replace(/[^a-z0-9]/gi, '-')}-${number}.png`
+    const name =
+      options.path || limitFileName(taskName.replace(/[^a-z0-9]/gi, '-'), `-${number}.png`)
 
     return new ScreenshotAction(name, options, async () => {
       const [element, ...mask] = await Promise.all([

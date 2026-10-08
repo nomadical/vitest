@@ -58,6 +58,7 @@ export {
   parseKeyDef,
   resolveScreenshotPath,
 } from './utils'
+export { limitFileName } from '@vitest/utils/helpers'
 
 const versionRegexp = /(?:\?|&)v=\w{8}/
 

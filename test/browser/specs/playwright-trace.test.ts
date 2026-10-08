@@ -1,6 +1,7 @@
 import { readdirSync, rmSync } from 'node:fs'
 import { resolve } from 'pathe'
 import { afterEach, describe, expect, test } from 'vitest'
+import { runInlineTests } from '../../test-utils'
 import { provider, runBrowserTests } from './utils'
 
 const tracesFolder = resolve(import.meta.dirname, '../fixtures/trace-view/__traces__')
@@ -184,5 +185,41 @@ describe.runIf(provider.name === 'playwright')('playwright tracing', () => {
     // the default reporter outputs attachments
     expect(stderr).toContain('❯ traces')
     expect(stderr).toContain('↳ __traces__/failing.special.ts/')
+  })
+
+  test('long test names produce shortened trace and attachment names', async () => {
+    const { stderr, fs } = await runInlineTests({
+      'basic.test.ts': /* ts */ `
+        import { test } from 'vitest'
+
+        test('${'a'.repeat(300)}', () => {})
+      `,
+      'vitest.config.js': /* js */ `
+        import { instances, provider } from '../settings.ts'
+
+        export default {
+          test: {
+            browser: {
+              enabled: true,
+              provider,
+              ui: false,
+              headless: true,
+              trace: 'on',
+              instances: instances.slice(0, 1),
+            },
+          },
+        }`,
+    })
+
+    expect(stderr).toBe('')
+    const traces = readdirSync(fs.resolveFile('__traces__/basic.test.ts'))
+    const attachments = readdirSync(fs.resolveFile('.vitest/attachments'))
+    expect(traces.map((name) => name.length)).toEqual([255])
+    expect(attachments.map((name) => name.length)).toEqual([255])
+    expect(traces.map((name) => name.replace(/a+/, '<name>'))).toMatchInlineSnapshot(`
+      [
+        "chromium-<name>-34455120.trace.zip",
+      ]
+    `)
   })
 })

@@ -3,7 +3,7 @@ import type { ParsedStack } from 'vitest'
 import type { BrowserCommand, BrowserCommandContext, BrowserProvider } from 'vitest/node'
 import type { PlaywrightBrowserProvider } from '../playwright'
 import { unlink } from 'node:fs/promises'
-import { assertBrowserApiWrite, assertBrowserFileAccess } from '@vitest/browser'
+import { assertBrowserApiWrite, assertBrowserFileAccess, limitFileName } from '@vitest/browser'
 import { basename, dirname, relative, resolve } from 'pathe'
 import { getDescribedLocator } from './utils'
 
@@ -48,7 +48,7 @@ export const startChunkTrace: BrowserCommand<[{ name: string; title: string }]> 
     }
     const path = resolveTracesPath(command, name)
     provider.pendingTraces.set(path, sessionId)
-    await context.tracing.startChunk({ name, title })
+    await context.tracing.startChunk({ title })
     return
   }
   throw new TypeError(`The ${provider.name} provider does not support tracing.`)
@@ -142,18 +142,14 @@ function resolveTracesPath({ testPath, project }: BrowserCommandContext, name: s
     throw new Error(`This command can only be called inside a test file.`)
   }
   const options = project.config.browser!.trace
-  const sanitizedName = `${project.name.replace(/[^a-z0-9]/gi, '-')}-${name}.trace.zip`
+  const sanitizedName = limitFileName(
+    `${project.name.replace(/[^a-z0-9]/gi, '-')}-${name}`,
+    '.trace.zip',
+  )
   if (options.tracesDir) {
     return resolve(options.tracesDir, sanitizedName)
   }
-  const dir = dirname(testPath)
-  const base = basename(testPath)
-  return resolve(
-    dir,
-    '__traces__',
-    base,
-    `${project.name.replace(/[^a-z0-9]/gi, '-')}-${name}.trace.zip`,
-  )
+  return resolve(dirname(testPath), '__traces__', basename(testPath), sanitizedName)
 }
 
 export const deleteTracing: BrowserCommand<[{ traces: string[] }]> = async (

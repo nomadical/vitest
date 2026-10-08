@@ -1,6 +1,6 @@
 import type { TestFsStructure } from '../../test-utils'
 import { readFileSync } from 'node:fs'
-import { resolve } from 'pathe'
+import { basename, resolve } from 'pathe'
 import { describe, expect, test } from 'vitest'
 import { runInlineTests } from '../../test-utils'
 import utilsContent from '../fixtures/expect-dom/utils?raw'
@@ -188,5 +188,23 @@ describe('failure screenshots', () => {
           - <root>/.vitest/attachments/failure-screenshots/basic.test.ts/soft-0-1.png"
       `)
     })
+  })
+
+  test('long test names produce a shortened failure screenshot name', async () => {
+    const longName = 'a'.repeat(300)
+    const { stderr } = await runBrowserTests({
+      [testFilename]: /* ts */ `
+          import { test } from 'vitest'
+
+          test('${longName}', ({ expect }) => {
+            expect(1).toBe(2)
+          })
+        `,
+    })
+
+    expect(stderr).not.toContain('Failed to take a screenshot')
+    const screenshotName = basename(extractScreenshotPath(stderr))
+    expect(screenshotName.length).toBe(255)
+    expect(screenshotName.replace(/a+/, '<name>')).toMatchInlineSnapshot(`"<name>-279e8f01.png"`)
   })
 })

@@ -3,6 +3,7 @@ import {
   deepClone,
   deepMerge,
   isNegativeNaN,
+  limitFileName,
   objectAttr,
   toArray,
 } from '@vitest/utils/helpers'
@@ -469,5 +470,31 @@ describe('parseSingleStack', () => {
     ['    at http://localhost:63315/100%.test.ts:4:1', '/100%.test.ts'],
   ])('%s', ([line, file]) => {
     expect(parseSingleStack(line)?.file).toBe(file)
+  })
+})
+
+describe('limitFileName', () => {
+  const byteLength = (s: string) => new TextEncoder().encode(s).length
+
+  test('keeps names that fit', () => {
+    expect(limitFileName('short-name', '.png')).toBe('short-name.png')
+    expect(limitFileName('a'.repeat(251), '.png')).toBe(`${'a'.repeat(251)}.png`)
+  })
+
+  test('truncates long names to 255 bytes and appends a hash', () => {
+    const name = limitFileName('a'.repeat(300), '-1.png')
+    expect(byteLength(name)).toBe(255)
+    expect(name.slice(240)).toMatchInlineSnapshot(`"-279e8f01-1.png"`)
+  })
+
+  test('keeps truncated names unique', () => {
+    const long = 'a'.repeat(300)
+    expect(limitFileName(`${long}-first`, '.png')).not.toBe(limitFileName(`${long}-second`, '.png'))
+  })
+
+  test('counts bytes and does not split multi-byte characters', () => {
+    const name = limitFileName('ä'.repeat(200), '.png')
+    expect(byteLength(name)).toBe(255)
+    expect(name.replace(/-[0-9a-f]{8}\.png$/, '')).toBe('ä'.repeat(121))
   })
 })

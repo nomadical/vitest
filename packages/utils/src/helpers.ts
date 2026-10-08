@@ -401,3 +401,32 @@ export function sanitizeFilePath(s: string): string {
   // oxlint-disable-next-line no-control-regex
   return s.replace(/[\x00-\x2C\x2E\x2F\x3A-\x40\x5B-\x60\x7B-\x7F]+/g, '-')
 }
+
+const MAX_FILE_NAME_BYTES = 255
+
+export function limitFileName(name: string, suffix = ''): string {
+  const encoder = new TextEncoder()
+  if (encoder.encode(name + suffix).length <= MAX_FILE_NAME_BYTES) {
+    return name + suffix
+  }
+  const hashSuffix = `-${hashString(name)}${suffix}`
+  let budget = MAX_FILE_NAME_BYTES - encoder.encode(hashSuffix).length
+  let truncated = ''
+  for (const char of name) {
+    budget -= encoder.encode(char).length
+    if (budget < 0) {
+      break
+    }
+    truncated += char
+  }
+  return truncated + hashSuffix
+}
+
+function hashString(s: string): string {
+  let hash = 0x811c9dc5
+  for (let i = 0; i < s.length; i++) {
+    hash ^= s.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193)
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0')
+}
