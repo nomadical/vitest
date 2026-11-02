@@ -815,6 +815,11 @@ matched only using [`toBeChecked`](#tobechecked) or
 It also accepts elements with roles `meter`, `progressbar`, `slider` or
 `spinbutton` and checks their `aria-valuenow` attribute (as a number).
 
+Elements with role `listbox` are matched like `<select>`: the value comes from
+the `role="option"` elements with `aria-selected="true"`, using each option's
+`value` attribute or, if it is missing, its text content. With
+`aria-multiselectable="true"`, the value is an array.
+
 For all other form elements, the value is matched using the same algorithm as in
 [`toHaveFormValues`](#tohaveformvalues) does.
 

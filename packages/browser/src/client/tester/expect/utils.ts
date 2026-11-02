@@ -216,6 +216,9 @@ export function getSingleElementValue(
     case 'SELECT':
       return getSelectValue(element as HTMLSelectElement)
     default: {
+      if (element.getAttribute('role') === 'listbox') {
+        return getListboxValue(element)
+      }
       return (element as any).value ?? getAccessibleValue(element)
     }
   }
@@ -232,6 +235,17 @@ function getSelectValue({ multiple, options }: HTMLSelectElement) {
     return undefined // Couldn't make this happen, but just in case
   }
   return selectedOptions[0].value
+}
+
+function getListboxValue(listbox: Element) {
+  const values = Array.from(
+    listbox.querySelectorAll('[role="option"][aria-selected="true"]'),
+    (option) => option.getAttribute('value') ?? normalize(option.textContent || ''),
+  )
+  if (listbox.getAttribute('aria-multiselectable') === 'true') {
+    return values
+  }
+  return values[0]
 }
 
 function getInputValue(inputElement: HTMLInputElement) {
