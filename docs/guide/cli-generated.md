@@ -902,12 +902,19 @@ Always print console stack traces
 
 Collect test and suite locations in the `location` property
 
+### outputDir
+
+- **CLI:** `--outputDir <dir>`
+- **Config:** [outputDir](/config/outputdir)
+
+The directory where Vitest writes its output, such as attachments and reports (default: `.vitest`)
+
 ### attachmentsDir
 
 - **CLI:** `--attachmentsDir <dir>`
 - **Config:** [attachmentsDir](/config/attachmentsdir)
 
-The directory where attachments from `context.annotate` are stored in (default: `.vitest/attachments`)
+The directory where attachments from `context.annotate` are stored in (default: `<outputDir>/attachments`)
 
 ### run
 

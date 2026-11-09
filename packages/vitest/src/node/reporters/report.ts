@@ -87,9 +87,7 @@ export interface Report {
 }
 
 export function createReport(ctx: Vitest, scope: string): Report {
-  const root = ctx.config.root
-  const vitestDir = resolve(root, '.vitest')
-  const reportDir = resolve(vitestDir, scope)
+  const reportDir = resolve(ctx.config.outputDir, scope)
 
   fsSync.mkdirSync(reportDir, { recursive: true })
 
@@ -112,19 +110,19 @@ export function createReport(ctx: Vitest, scope: string): Report {
     },
 
     async readFile(filename, encoding = 'utf8') {
-      return await readFile(resolve(vitestDir, scope, filename), encoding)
+      return await readFile(resolve(reportDir, filename), encoding)
     },
 
     async readdir() {
-      return await readdir(resolve(vitestDir, scope))
+      return await readdir(reportDir)
     },
 
     async writeFile(filename, content, encoding = 'utf8') {
-      await writeFile(resolve(vitestDir, scope, filename), content, encoding)
+      await writeFile(resolve(reportDir, filename), content, encoding)
     },
 
     async delete(filename) {
-      await rm(resolve(vitestDir, scope, filename), { recursive: true, force: true })
+      await rm(resolve(reportDir, filename), { recursive: true, force: true })
     },
   }
 }

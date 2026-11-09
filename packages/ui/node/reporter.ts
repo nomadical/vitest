@@ -31,7 +31,9 @@ export default class HTMLReporter implements Reporter {
 
   async onInit(ctx: Vitest): Promise<void> {
     this.ctx = ctx
-    this.reporterDir = resolve(this.ctx.config.root, this.options.outputDir || '.vitest')
+    this.reporterDir = this.options.outputDir
+      ? resolve(this.ctx.config.root, this.options.outputDir)
+      : this.ctx.config.outputDir
   }
 
   async onTestRunEnd(

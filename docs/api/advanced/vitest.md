@@ -216,7 +216,7 @@ This method can be slow because it needs to filter `--changed` flags. Do not use
 function mergeReports(directory?: string): Promise<TestRunResult>
 ```
 
-Merge reports from multiple runs located in the specified directory (value from `--merge-reports` if not specified). This value can also be set on `config.mergeReports` (by default, it will read `.vitest/blob/` folder).
+Merge reports from multiple runs located in the specified directory (value from `--merge-reports` if not specified). This value can also be set on `config.mergeReports` (by default, it will read the `blob/` folder inside [`outputDir`](/config/outputdir)).
 
 Note that the `directory` will always be resolved relative to the working directory.
 
@@ -723,7 +723,7 @@ Creates a report that is limited to the given scope. `Report` follows Vitest's r
 
 `Report` provides collection of utilities for writing test results, temporary files and other artifacts on the file system. It's especially intended for third party integrations like custom reporters.
 
-All operations of `Report` are limited to given `scope`. A single report cannot interfere with other reports. Internally Vitest creates `.vitest` directory where each `scope` creates their own directory. This convention of `.vitest` directory reduces the amount of entries end-users need to specify in their `.gitignore`.
+All operations of `Report` are limited to given `scope`. A single report cannot interfere with other reports. Internally Vitest creates the [`outputDir`](/config/outputdir) directory (`.vitest` by default) where each `scope` creates their own directory. This convention of `.vitest` directory reduces the amount of entries end-users need to specify in their `.gitignore`.
 
 ```ts
 import type { Report } from 'vitest/node'

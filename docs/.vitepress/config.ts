@@ -588,6 +588,10 @@ export default ({ mode }: { mode: string }) => {
                     link: '/config/printconsoletrace',
                   },
                   {
+                    text: 'outputDir',
+                    link: '/config/outputdir',
+                  },
+                  {
                     text: 'attachmentsDir',
                     link: '/config/attachmentsdir',
                   },

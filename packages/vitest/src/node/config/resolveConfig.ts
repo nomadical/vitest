@@ -229,6 +229,7 @@ export function resolveTestConfig(
   // appended to the same exclude list below, keeping them out of the report.
   if (globalConfig) {
     resolved.coverage = globalConfig.coverage
+    resolved.outputDir = globalConfig.outputDir
     resolved.attachmentsDir = globalConfig.attachmentsDir
     resolved.mergeReportsLabel = globalConfig.mergeReportsLabel
     resolved.watch = globalConfig.watch
@@ -237,6 +238,15 @@ export function resolveTestConfig(
   const rootStats = statSync(resolved.root, { throwIfNoEntry: false })
   if (!rootStats?.isDirectory()) {
     throw new Error(`Root path does not exist or is not a directory: ${resolved.root}`)
+  }
+
+  resolved.outputDir = resolve(resolved.root, resolved.outputDir ?? '.vitest')
+  resolved.attachmentsDir = resolved.attachmentsDir
+    ? resolve(resolved.root, resolved.attachmentsDir)
+    : resolve(resolved.outputDir, 'attachments')
+  // `--merge-reports` without a path
+  if (resolved.mergeReports === '') {
+    resolved.mergeReports = resolve(resolved.outputDir, 'blob')
   }
 
   resolved.mode ??= viteConfig.mode ?? 'test'
@@ -653,8 +663,6 @@ export function resolveTestConfig(
   if (resolved.runner) {
     resolved.runner = resolvePath(resolved.runner, resolved.root)
   }
-
-  resolved.attachmentsDir = resolve(resolved.root, resolved.attachmentsDir ?? '.vitest/attachments')
 
   if (resolved.snapshotEnvironment) {
     resolved.snapshotEnvironment = resolvePath(resolved.snapshotEnvironment, resolved.root)

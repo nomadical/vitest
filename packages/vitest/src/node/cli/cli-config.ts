@@ -844,9 +844,14 @@ export const cliOptionsConfig: VitestCLIOptions = {
   includeTaskLocation: {
     description: 'Collect test and suite locations in the `location` property',
   },
+  outputDir: {
+    description:
+      'The directory where Vitest writes its output, such as attachments and reports (default: `.vitest`)',
+    argument: '<dir>',
+  },
   attachmentsDir: {
     description:
-      'The directory where attachments from `context.annotate` are stored in (default: `.vitest/attachments`)',
+      'The directory where attachments from `context.annotate` are stored in (default: `<outputDir>/attachments`)',
     argument: '<dir>',
   },
 
@@ -876,7 +881,7 @@ export const cliOptionsConfig: VitestCLIOptions = {
     argument: '[path]',
     transform(value) {
       if (!value || typeof value === 'boolean') {
-        return '.vitest/blob'
+        return ''
       }
       return value
     },

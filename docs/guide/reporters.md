@@ -553,7 +553,7 @@ export default defineConfig({
 
 Generates a static version of [Vitest UI](/guide/ui) for reviewing completed test runs. See the [HTML Reporter guide](/guide/ui#html-reporter) for local preview, CI artifacts, and sharing workflows.
 
-The report artifact root can be specified using the reporter's `outputDir` option and the report entry is written to `<outputDir>/index.html`. By default `outputDir` is the shared Vitest artifact directory `.vitest`.
+The report artifact root can be specified using the reporter's `outputDir` option and the report entry is written to `<outputDir>/index.html`. By default it is the root [`outputDir`](/config/outputdir) (`.vitest`).
 
 Use `singleFile` to produce one portable HTML file. See [Share as a Single File](/guide/ui#share-as-a-single-file) for configuration and limitations.
 
@@ -817,7 +817,7 @@ export default defineConfig({
 ### Blob Reporter
 
 Stores test results on the machine so they can be later merged using [`--merge-reports`](/guide/cli#merge-reports) command.
-By default, stores all results in `.vitest/blob/` folder, but can be overridden with `--outputFile` or `--outputFile.blob` flags.
+By default, stores all results in the `blob/` folder inside [`outputDir`](/config/outputdir) (`.vitest/blob/`), but can be overridden with `--outputFile` or `--outputFile.blob` flags.
 
 ```bash
 npx vitest --reporter=blob --outputFile=reports/blob-1.json

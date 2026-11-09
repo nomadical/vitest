@@ -937,9 +937,16 @@ export interface InlineConfig {
   includeTaskLocation?: boolean
 
   /**
+   * Directory where Vitest writes its output, such as attachments and reports.
+   *
+   * @default '.vitest'
+   */
+  outputDir?: string
+
+  /**
    * Directory path for storing attachments created by `context.annotate`
    *
-   * @default '.vitest/attachments'
+   * @default '<outputDir>/attachments'
    */
   attachmentsDir?: string
 
@@ -1213,7 +1220,7 @@ export interface UserConfig extends InlineConfig {
 
   /**
    * Directory of blob reports to merge
-   * @default '.vitest/blob'
+   * @default '<outputDir>/blob'
    */
   mergeReports?: string
 
@@ -1507,6 +1514,7 @@ type NonProjectOptions =
   | 'update'
   | 'reporters'
   | 'outputFile'
+  | 'outputDir'
   | 'teardownTimeout'
   | 'silent'
   | 'forceRerunTriggers'
